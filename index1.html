@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HireAI — CV Screener & Feedback Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Clash+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070B14;
+    --surface: #0D1425;
+    --card: #111827;
+    --border: #1E293B;
+    --border2: #2D3748;
+    --blue: #3B82F6;
+    --blue2: #60A5FA;
+    --cyan: #06B6D4;
+    --green: #10B981;
+    --red: #EF4444;
+    --amber: #F59E0B;
+    --purple: #8B5CF6;
+    --pink: #EC4899;
+    --white: #F8FAFC;
+    --muted: #64748B;
+    --text: #E2E8F0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── ANIMATED BG ── */
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  .bg-glow {
+    position: fixed; z-index: 0; pointer-events: none;
+    border-radius: 50%; filter: blur(120px); opacity: 0.15;
+  }
+
+  .glow-1 {
+    width: 600px; height: 600px;
+    background: var(--blue);
+    top: -200px; left: -200px;
+    animation: glowMove1 8s ease-in-out infinite alternate;
+  }
+
+  .glow-2 {
+    width: 500px; height: 500px;
+    background: var(--purple);
+    bottom: -100px; right: -100px;
+    animation: glowMove2 10s ease-in-out infinite alternate;
+  }
+
+  .glow-3 {
+    width: 300px; height: 300px;
+    background: var(--cyan);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation: glowMove3 12s ease-in-out infinite alternate;
+  }
+
+  @keyframes glowMove1 {
+    from { transform: translate(0, 0); }
+    to { transform: translate(100px, 80px); }
+  }
+  @keyframes glowMove2 {
+    from { transform: translate(0, 0); }
+    to { transform: translate(-80px, -60px); }
+  }
+  @keyframes glowMove3 {
+    from { transform: translate(-50%, -50%) scale(1); opacity: 0.1; }
+    to { transform: translate(-50%, -50%) scale(1.4); opacity: 0.06; }
+  }
+
+  /* ── CONTENT WRAPPER ── */
+  .content { position: relative; z-index: 10; }
+
+  /* ── HEADER ── */
+  header {
+    background: rgba(7,11,20,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+
+  .logo-wrap { display: flex; align-items: center; gap: 12px; }
+
+  .logo-mark {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--blue), var(--cyan));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700; font-size: 11px; color: #fff;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  }
+
+  .logo-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 18px; color: var(--white);
+    letter-spacing: -0.5px;
+  }
+
+  .logo-name span { color: var(--blue2); }
+
+  .header-pills { display: flex; align-items: center; gap: 10px; }
+
+  .pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 5px 12px;
+    border-radius: 100px;
+  }
+
+  .pill-blue {
+    background: rgba(59,130,246,0.15);
+    border: 1px solid rgba(59,130,246,0.3);
+    color: var(--blue2);
+  }
+
+  .pill-white {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #94A3B8;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 100px 48px 80px;
+    max-width: 1100px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(59,130,246,0.1);
+    border: 1px solid rgba(59,130,246,0.25);
+    padding: 6px 16px; border-radius: 100px;
+    font-size: 11px; color: var(--blue2);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 32px;
+    animation: fadeDown 0.6s ease forwards;
+  }
+
+  .badge-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--blue);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.7); }
+  }
+
+  .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 72px;
+    line-height: 1.0; color: var(--white);
+    letter-spacing: -3px; margin-bottom: 24px;
+    animation: fadeUp 0.7s ease 0.1s both;
+  }
+
+  .hero h1 .gradient-text {
+    background: linear-gradient(135deg, var(--blue), var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    font-size: 18px; color: #94A3B8;
+    line-height: 1.7; max-width: 580px; margin: 0 auto 48px;
+    font-weight: 300;
+    animation: fadeUp 0.7s ease 0.2s both;
+  }
+
+  /* STATS ROW */
+  .hero-stats {
+    display: flex; align-items: center; justify-content: center;
+    gap: 40px; margin-bottom: 60px;
+    animation: fadeUp 0.7s ease 0.3s both;
+  }
+
+  .stat-item { text-align: center; }
+
+  .stat-number {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 28px; color: var(--white);
+    letter-spacing: -1px;
+  }
+
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; color: var(--muted);
+    letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px;
+  }
+
+  .stat-divider { width: 1px; height: 40px; background: var(--border2); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── MAIN ── */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 48px 80px;
+  }
+
+  /* INPUT PANEL */
+  .input-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 40px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .input-panel::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--blue), var(--cyan), var(--purple));
+  }
+
+  .panel-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600; font-size: 13px;
+    color: var(--white); letter-spacing: 0.02em;
+    margin-bottom: 24px; display: flex; align-items: center; gap: 10px;
+  }
+
+  .panel-title-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--cyan));
+  }
+
+  /* ROLE INPUT */
+  .role-field {
+    margin-bottom: 28px;
+  }
+
+  .field-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; color: var(--muted);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 10px; display: block;
+  }
+
+  .role-input {
+    width: 100%; background: var(--surface);
+    border: 1px solid var(--border2);
+    padding: 14px 18px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; color: var(--white);
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    border-radius: 4px;
+  }
+
+  .role-input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+  }
+
+  .role-input::placeholder { color: #334155; }
+
+  /* SAMPLE CHIPS */
+  .sample-section { margin-bottom: 20px; }
+
+  .sample-row {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;
+  }
+
+  .sample-chip {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 7px 14px;
+    background: var(--surface); border: 1px solid var(--border2);
+    cursor: pointer; transition: all 0.2s; color: #94A3B8;
+    border-radius: 4px;
+  }
+
+  .sample-chip:hover {
+    background: rgba(59,130,246,0.1);
+    border-color: rgba(59,130,246,0.4);
+    color: var(--blue2);
+    transform: translateY(-1px);
+  }
+
+  .sample-chip.active {
+    background: rgba(59,130,246,0.2);
+    border-color: var(--blue);
+    color: var(--blue2);
+  }
+
+  /* TWO COL */
+  .two-col {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .textarea-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .char-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; color: var(--muted);
+  }
+
+  .paste-area {
+    width: 100%; min-height: 260px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    padding: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; line-height: 1.8; color: var(--text);
+    resize: vertical; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    border-radius: 4px;
+  }
+
+  .paste-area:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+  }
+
+  .paste-area::placeholder { color: #1E293B; font-style: italic; }
+
+  /* ANALYZE BTN */
+  .analyze-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--blue), #1D4ED8);
+    color: #fff; border: none;
+    padding: 18px 32px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px; font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    position: relative; overflow: hidden;
+  }
+
+  .analyze-btn::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, transparent, rgba(255,255,255,0.1));
+    opacity: 0; transition: opacity 0.2s;
+  }
+
+  .analyze-btn:hover::after { opacity: 1; }
+  .analyze-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(59,130,246,0.4); }
+  .analyze-btn:active { transform: translateY(0); }
+  .analyze-btn:disabled {
+    background: #1E293B; color: #475569;
+    cursor: not-allowed; transform: none; box-shadow: none;
+  }
+
+  /* LOADING */
+  .loading-state {
+    display: none; padding: 100px 0; text-align: center;
+  }
+
+  .loading-state.active { display: block; }
+
+  .loading-bars {
+    display: flex; align-items: flex-end; justify-content: center;
+    gap: 4px; height: 40px; margin-bottom: 24px;
+  }
+
+  .loading-bar {
+    width: 4px; background: var(--blue);
+    border-radius: 2px;
+    animation: barBounce 1.2s ease-in-out infinite;
+  }
+
+  .loading-bar:nth-child(1) { animation-delay: 0s; }
+  .loading-bar:nth-child(2) { animation-delay: 0.1s; }
+  .loading-bar:nth-child(3) { animation-delay: 0.2s; }
+  .loading-bar:nth-child(4) { animation-delay: 0.3s; }
+  .loading-bar:nth-child(5) { animation-delay: 0.4s; }
+
+  @keyframes barBounce {
+    0%, 100% { height: 8px; opacity: 0.3; }
+    50% { height: 36px; opacity: 1; }
+  }
+
+  .loading-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; color: var(--muted);
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+
+  /* RESULTS */
+  .results-section { display: none; }
+  .results-section.active { display: block; }
+
+  /* SCORE BANNER */
+  .score-banner {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 36px 40px;
+    display: flex; align-items: center; gap: 32px;
+    margin-bottom: 24px;
+    position: relative; overflow: hidden;
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .score-banner::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+
+  .banner-strong::before { background: linear-gradient(90deg, var(--green), #34D399); }
+  .banner-good::before { background: linear-gradient(90deg, var(--amber), #FCD34D); }
+  .banner-weak::before { background: linear-gradient(90deg, var(--red), #F87171); }
+
+  .score-ring {
+    flex-shrink: 0;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    border: 3px solid;
+    position: relative;
+  }
+
+  .ring-strong { border-color: var(--green); box-shadow: 0 0 24px rgba(16,185,129,0.3); }
+  .ring-good { border-color: var(--amber); box-shadow: 0 0 24px rgba(245,158,11,0.3); }
+  .ring-weak { border-color: var(--red); box-shadow: 0 0 24px rgba(239,68,68,0.3); }
+
+  .score-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 30px; line-height: 1;
+    letter-spacing: -1px;
+  }
+
+  .num-strong { color: #34D399; }
+  .num-good { color: #FCD34D; }
+  .num-weak { color: #F87171; }
+
+  .score-pct {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; color: var(--muted); margin-top: 2px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+
+  .score-content { flex: 1; }
+
+  .score-verdict {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 20px; color: var(--white);
+    margin-bottom: 8px; letter-spacing: -0.3px;
+  }
+
+  .score-summary {
+    font-size: 13px; color: #94A3B8; line-height: 1.6;
+  }
+
+  .rec-badge {
+    flex-shrink: 0; padding: 10px 18px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    border-radius: 4px; border: 1px solid;
+  }
+
+  .rec-yes { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.3); color: #34D399; }
+  .rec-no { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #F87171; }
+  .rec-maybe { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3); color: #FCD34D; }
+
+  /* RESULT GRID */
+  .result-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 24px;
+    animation: cardSlide 0.4s ease forwards; opacity: 0;
+  }
+
+  @keyframes cardSlide {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px; padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-icon-wrap {
+    width: 30px; height: 30px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+
+  .icon-green { background: rgba(16,185,129,0.15); }
+  .icon-red { background: rgba(239,68,68,0.15); }
+  .icon-blue { background: rgba(59,130,246,0.15); }
+  .icon-amber { background: rgba(245,158,11,0.15); }
+
+  .card-title-text {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600; font-size: 13px; color: var(--white);
+  }
+
+  .list-item {
+    display: flex; gap: 10px; padding: 8px 0;
+    border-bottom: 1px solid rgba(30,41,59,0.6);
+    font-size: 12px; line-height: 1.6; color: #CBD5E1;
+  }
+
+  .list-item:last-child { border-bottom: none; }
+
+  .list-dot {
+    flex-shrink: 0; margin-top: 6px;
+    width: 5px; height: 5px; border-radius: 50%;
+  }
+
+  .dot-g { background: var(--green); }
+  .dot-r { background: var(--red); }
+  .dot-a { background: var(--amber); }
+  .dot-b { background: var(--blue); }
+
+  /* SKILLS */
+  .skills-card {
+    background: var(--card); border: 1px solid var(--border);
+    padding: 24px; margin-bottom: 16px;
+    animation: cardSlide 0.4s ease 0.2s forwards; opacity: 0;
+  }
+
+  .skills-wrap {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px;
+  }
+
+  .skill-chip {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; padding: 5px 12px;
+    border-radius: 4px; border: 1px solid;
+    letter-spacing: 0.04em;
+    transition: transform 0.15s;
+  }
+
+  .skill-chip:hover { transform: translateY(-1px); }
+
+  .chip-present { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.3); color: #34D399; }
+  .chip-missing { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #F87171; }
+  .chip-partial { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3); color: #FCD34D; }
+
+  /* FEEDBACK */
+  .feedback-card {
+    background: linear-gradient(135deg, #0F172A, #1E1B4B);
+    border: 1px solid rgba(139,92,246,0.2);
+    padding: 32px 36px; margin-bottom: 16px;
+    position: relative; overflow: hidden;
+    animation: cardSlide 0.4s ease 0.3s forwards; opacity: 0;
+  }
+
+  .feedback-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--purple), var(--pink));
+  }
+
+  .feedback-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; color: #A78BFA;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+  }
+
+  .feedback-label::before {
+    content: '';
+    width: 16px; height: 1px; background: #A78BFA;
+  }
+
+  .feedback-text {
+    font-size: 14px; line-height: 1.8; color: #C4B5FD;
+    font-style: italic;
+  }
+
+  /* IMPROVEMENTS */
+  .improve-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--cyan);
+    padding: 24px; margin-bottom: 32px;
+    animation: cardSlide 0.4s ease 0.4s forwards; opacity: 0;
+  }
+
+  .improve-item {
+    display: flex; gap: 16px; padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .improve-item:last-child { border-bottom: none; }
+
+  .improve-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 22px;
+    background: linear-gradient(135deg, var(--cyan), var(--blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    flex-shrink: 0; line-height: 1;
+  }
+
+  .improve-body strong {
+    display: block; font-size: 13px; font-weight: 600;
+    color: var(--white); margin-bottom: 4px;
+  }
+
+  .improve-body p { font-size: 12px; color: #94A3B8; line-height: 1.6; }
+
+  /* RESET */
+  .reset-btn {
+    background: transparent;
+    border: 1px solid var(--border2); padding: 12px 24px;
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    color: var(--muted); cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; gap: 8px;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    border-radius: 4px;
+  }
+
+  .reset-btn:hover {
+    border-color: var(--blue); color: var(--blue2);
+    background: rgba(59,130,246,0.05);
+  }
+
+  /* ERROR */
+  .error-msg {
+    display: none;
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.3);
+    padding: 12px 16px; margin-bottom: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; color: #F87171;
+    border-radius: 4px;
+  }
+
+  .error-msg.active { display: block; }
+
+  /* ── CTA BANNER ── */
+  .cta-banner {
+    background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 50%, #0F172A 100%);
+    border: 1px solid rgba(139,92,246,0.3);
+    padding: 56px 48px;
+    text-align: center;
+    position: relative; overflow: hidden;
+    margin-top: 80px;
+  }
+
+  .cta-banner::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--blue), var(--cyan), var(--purple), var(--pink));
+  }
+
+  .cta-glow {
+    position: absolute; width: 400px; height: 400px;
+    background: var(--purple); filter: blur(100px); opacity: 0.08;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .cta-tag {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; color: #A78BFA;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    border: 1px solid rgba(139,92,246,0.3);
+    padding: 4px 14px; border-radius: 100px; margin-bottom: 24px;
+  }
+
+  .cta-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 36px; color: var(--white);
+    letter-spacing: -1px; margin-bottom: 12px;
+    position: relative; z-index: 1;
+  }
+
+  .cta-title span {
+    background: linear-gradient(135deg, var(--blue2), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .cta-sub {
+    font-size: 15px; color: #94A3B8;
+    line-height: 1.6; max-width: 480px;
+    margin: 0 auto 32px;
+    position: relative; z-index: 1;
+  }
+
+  .cta-email-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: linear-gradient(135deg, var(--blue), #7C3AED);
+    color: #fff; padding: 16px 32px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; font-weight: 700;
+    border-radius: 6px; text-decoration: none;
+    transition: all 0.2s; position: relative; z-index: 1;
+    border: none; cursor: pointer;
+  }
+
+  .cta-email-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(99,102,241,0.4);
+  }
+
+  .cta-email {
+    display: block; margin-top: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; color: #64748B;
+    letter-spacing: 0.06em;
+    position: relative; z-index: 1;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 20px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .footer-left {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px; color: var(--blue2); font-weight: 600;
+  }
+
+  .footer-right {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; color: #334155;
+    letter-spacing: 0.06em;
+  }
+
+  .footer-right span { color: #475569; }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    header, footer { padding-left: 20px; padding-right: 20px; }
+    .hero { padding: 60px 20px 40px; }
+    .hero h1 { font-size: 40px; letter-spacing: -1.5px; }
+    .main { padding: 0 20px 60px; }
+    .two-col { grid-template-columns: 1fr; }
+    .result-grid { grid-template-columns: 1fr; }
+    .score-banner { flex-direction: column; text-align: center; gap: 20px; }
+    .hero-stats { gap: 20px; }
+    .stat-number { font-size: 22px; }
+    .input-panel { padding: 24px 20px; }
+    .cta-banner { padding: 40px 20px; }
+    .cta-title { font-size: 26px; }
+    .header-pills { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow glow-1"></div>
+<div class="bg-glow glow-2"></div>
+<div class="bg-glow glow-3"></div>
+
+<div class="content">
+
+<!-- HEADER -->
+<header>
+  <div class="logo-wrap">
+    <div class="logo-mark">HR</div>
+    <div>
+      <div class="logo-name">Hire<span>AI</span></div>
+    </div>
+  </div>
+  <div class="header-pills">
+    <div class="pill pill-blue">Powered by Claude AI</div>
+    <div class="pill pill-white">Built by Adomokhai Joseph</div>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">
+    <div class="badge-dot"></div>
+    HR Intelligence · Recruitment Automation
+  </div>
+  <h1>Screen CVs.<br><span class="gradient-text">Instantly.</span></h1>
+  <p>Paste a job description and a candidate CV. HireAI scores the match, flags every strength and gap, and drafts the feedback email — in seconds, not hours.</p>
+
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-number">30s</div>
+      <div class="stat-label">Per Candidate</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <div class="stat-number">4hrs</div>
+      <div class="stat-label">Saved Per Round</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <div class="stat-number">100%</div>
+      <div class="stat-label">Human Review</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <div class="stat-number">Free</div>
+      <div class="stat-label">Always</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- INPUT -->
+  <div id="inputSection">
+    <div class="input-panel">
+      <div class="panel-title">
+        <div class="panel-title-dot"></div>
+        Screening Configuration
+      </div>
+
+      <div class="role-field">
+        <span class="field-label">Job Role (optional)</span>
+        <input type="text" class="role-input" id="roleInput"
+          placeholder="e.g. Senior Product Manager, Data Analyst, Marketing Director...">
+      </div>
+
+      <div class="sample-section">
+        <span class="field-label">Load sample data to see a demo →</span>
+        <div class="sample-row">
+          <button class="sample-chip" id="chip-jd" onclick="loadSample('jd')">Sample Job Description</button>
+          <button class="sample-chip" id="chip-strong" onclick="loadSample('cv-strong')">Strong Candidate CV</button>
+          <button class="sample-chip" id="chip-weak" onclick="loadSample('cv-weak')">Weak Candidate CV</button>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <div class="textarea-header">
+            <span class="field-label">Job Description</span>
+            <span class="char-badge" id="jdCount">0 chars</span>
+          </div>
+          <textarea class="paste-area" id="jdInput"
+            placeholder="Paste the full job description here — requirements, responsibilities, skills..."></textarea>
+        </div>
+        <div>
+          <div class="textarea-header">
+            <span class="field-label">Candidate CV / Resume</span>
+            <span class="char-badge" id="cvCount">0 chars</span>
+          </div>
+          <textarea class="paste-area" id="cvInput"
+            placeholder="Paste the candidate's CV or resume text here..."></textarea>
+        </div>
+      </div>
+
+      <div class="error-msg" id="errorMsg"></div>
+
+      <button class="analyze-btn" id="analyzeBtn" onclick="analyzeCV()">
+        <span>⚡</span>
+        Screen This Candidate
+      </button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading-state" id="loadingState">
+    <div class="loading-bars">
+      <div class="loading-bar"></div>
+      <div class="loading-bar"></div>
+      <div class="loading-bar"></div>
+      <div class="loading-bar"></div>
+      <div class="loading-bar"></div>
+    </div>
+    <div class="loading-text" id="loadingText">Reading CV structure...</div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results-section" id="resultsSection">
+
+    <div class="score-banner" id="scoreBanner">
+      <div class="score-ring" id="scoreRing">
+        <div class="score-num" id="scoreNum">0%</div>
+        <div class="score-pct">Match</div>
+      </div>
+      <div class="score-content">
+        <div class="score-verdict" id="scoreVerdict"></div>
+        <div class="score-summary" id="scoreSummary"></div>
+      </div>
+      <div class="rec-badge" id="recBadge"></div>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-card" style="animation-delay:0.1s">
+        <div class="card-header">
+          <div class="card-icon-wrap icon-green">✓</div>
+          <div class="card-title-text">Strengths</div>
+        </div>
+        <div id="strengthsList"></div>
+      </div>
+      <div class="result-card" style="animation-delay:0.15s">
+        <div class="card-header">
+          <div class="card-icon-wrap icon-red">✕</div>
+          <div class="card-title-text">Gaps & Red Flags</div>
+        </div>
+        <div id="gapsList"></div>
+      </div>
+    </div>
+
+    <div class="skills-card">
+      <div class="card-header">
+        <div class="card-icon-wrap icon-blue">◈</div>
+        <div class="card-title-text">Skills Match Analysis</div>
+      </div>
+      <div class="skills-wrap" id="skillsWrap"></div>
+    </div>
+
+    <div class="feedback-card">
+      <div class="feedback-label">Recruiter Feedback Draft</div>
+      <div class="feedback-text" id="feedbackText"></div>
+    </div>
+
+    <div class="improve-card">
+      <div class="card-header" style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--border);">
+        <div class="card-icon-wrap icon-blue">→</div>
+        <div class="card-title-text">Top Follow-Up Actions</div>
+      </div>
+      <div id="improveList"></div>
+    </div>
+
+    <button class="reset-btn" onclick="resetTool()">← Screen Another Candidate</button>
+  </div>
+
+</div>
+
+<!-- CTA BANNER -->
+<div class="cta-banner">
+  <div class="cta-glow"></div>
+  <div class="cta-tag">Custom AI Solutions</div>
+  <div class="cta-title">Want this for your <span>company?</span></div>
+  <p class="cta-sub">I build custom AI tools tailored to your specific hiring process, industry, and workflow. From CV screening to onboarding automation — let's build it together.</p>
+  <a href="mailto:josephadomokhai37@gmail.com" class="cta-email-btn">
+    <span>✉</span>
+    Get in Touch
+  </a>
+  <div class="cta-email">josephadomokhai37@gmail.com</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">HireAI — CV Screener & Feedback Generator</div>
+  <div class="footer-right">Built by <span>Adomokhai Joseph</span> · AI Workflow Engineer · Powered by Claude AI</div>
+</footer>
+
+</div><!-- end .content -->
+
+<script>
+const samples = {
+  jd: `SENIOR PRODUCT MANAGER — SAAS PLATFORM
+
+We are looking for an experienced Senior Product Manager to lead the development of our B2B SaaS platform. You will work closely with engineering, design, and go-to-market teams to define product strategy, prioritize the roadmap, and deliver features that drive customer value and revenue growth.
+
+REQUIREMENTS:
+- 5+ years of product management experience, ideally in B2B SaaS
+- Proven track record of launching successful software products
+- Strong data analysis skills — comfortable with SQL, analytics tools
+- Experience working with agile/scrum development teams
+- Excellent stakeholder communication and presentation skills
+- Experience with user research, A/B testing, and conversion optimization
+- Familiarity with product analytics tools (Amplitude, Mixpanel, or similar)
+- Strong understanding of API integrations and technical product concepts
+
+NICE TO HAVE:
+- Experience in fintech, HR tech, or enterprise software
+- Background in UX/UI design or customer success
+- MBA or equivalent business qualification`,
+
+  'cv-strong': `JAMES OKONKWO — Senior Product Manager
+London, UK | james.okonkwo@email.com
+
+SUMMARY
+Results-driven Senior Product Manager with 7 years of experience leading B2B SaaS product development across fintech and HR tech. Proven track record shipping products that drive measurable revenue growth and retention.
+
+EXPERIENCE
+
+Senior Product Manager — PayFlow Technologies (2021–Present)
+- Led roadmap for core payments platform serving 2,400+ enterprise clients
+- Launched 3 major features resulting in 34% increase in user activation
+- Managed cross-functional team of 12 across engineering, design, and data
+- Ran 40+ user research interviews and A/B tests to inform product decisions
+- Used Amplitude and SQL to track KPIs and drive data-informed prioritization
+
+Product Manager — HRSync Ltd (2019–2021)
+- Owned end-to-end product lifecycle for employee onboarding module
+- Reduced customer churn by 18% through targeted feature improvements
+- Collaborated daily with scrum teams using Jira and Confluence
+- Presented quarterly roadmap updates to C-suite stakeholders
+
+SKILLS
+Product Strategy · SQL · Amplitude · Mixpanel · Agile/Scrum · A/B Testing · User Research · API Integrations · Stakeholder Management · Jira · Figma
+
+EDUCATION
+BSc Computer Science — University of Lagos (2013–2017)
+MBA — London Business School (2020–2021)`,
+
+  'cv-weak': `SARAH MENSAH — Project Coordinator
+sarah.mensah@gmail.com
+
+WORK HISTORY
+Project Coordinator — BuildCo Construction (2022–Present)
+Coordinated project timelines and communicated with clients. Managed spreadsheets and attended weekly meetings.
+
+Admin Assistant — LocalShop Retail (2020–2022)
+Answered phones, filed documents, managed social media pages.
+
+Freelance (2018–2020)
+Content writing and website help for local businesses.
+
+SKILLS: Microsoft Office, Social Media, Communication, Teamwork
+EDUCATION: HND Business Administration — Community College (2016–2018)`
+};
+
+const results = {
+  strong: {
+    score: 91, scoreClass: 'ring-strong', numClass: 'num-strong',
+    bannerClass: 'banner-strong',
+    verdict: "Strong Match — Highly Recommended",
+    summary: "This candidate demonstrates exceptional alignment with the role. 7 years B2B SaaS PM experience, proven measurable outcomes, and direct tool experience. Significantly exceeds baseline requirements.",
+    recLabel: "✓ Recommend", recClass: "rec-yes",
+    strengths: [
+      "7 years PM experience significantly exceeds the 5-year requirement",
+      "Direct fintech and HR tech experience matches preferred industry background",
+      "Measurable outcomes: 34% activation increase, 18% churn reduction",
+      "SQL, Amplitude, and Mixpanel proficiency matches analytics requirements directly",
+      "MBA from London Business School adds strategic depth above baseline",
+      "C-suite presentation experience demonstrates required communication level"
+    ],
+    gaps: [
+      "A/B testing referenced but methodology not detailed in experience",
+      "API integration background described briefly — limited technical depth shown",
+      "User research scope not quantified beyond interview count"
+    ],
+    skills: [
+      {n:"B2B SaaS PM",s:"present"},{n:"SQL",s:"present"},{n:"Amplitude/Mixpanel",s:"present"},
+      {n:"Agile/Scrum",s:"present"},{n:"A/B Testing",s:"partial"},{n:"User Research",s:"present"},
+      {n:"API Knowledge",s:"partial"},{n:"Stakeholder Comms",s:"present"},
+      {n:"Roadmap Planning",s:"present"},{n:"UX/UI Background",s:"present"},{n:"MBA",s:"present"}
+    ],
+    feedback: "Dear James, thank you for your application for the Senior Product Manager role. Your profile is one of the strongest we have reviewed. Your 7-year track record across fintech and HR tech, combined with demonstrated ability to deliver measurable product outcomes — including a 34% activation increase at PayFlow — aligns closely with what we are building. We would like to invite you to the next stage of our process.",
+    improvements: [
+      {t:"A/B Testing Depth", b:"Request specific examples of test methodology, sample sizes, and decisions driven by results"},
+      {t:"API Technical Scope", b:"Ask candidate to elaborate on specific API integration projects and technical ownership"},
+      {t:"Team Leadership Style", b:"Explore how they managed cross-functional teams of 12 — conflict resolution and trade-offs"}
+    ]
+  },
+  weak: {
+    score: 12, scoreClass: 'ring-weak', numClass: 'num-weak',
+    bannerClass: 'banner-weak',
+    verdict: "Poor Match — Not Recommended",
+    summary: "Background is in construction coordination and retail administration. No software PM experience, no technical skills, and no B2B SaaS exposure. Fundamental gaps across all core requirements.",
+    recLabel: "✕ Do Not Progress", recClass: "rec-no",
+    strengths: [
+      "Demonstrates coordination and organizational skills transferable at a basic level",
+      "Some client-facing experience in project coordination role"
+    ],
+    gaps: [
+      "Zero product management experience — no software PM background",
+      "No SaaS, tech, or software industry experience whatsoever",
+      "No SQL, Amplitude, Mixpanel, or any analytics tool proficiency",
+      "No agile/scrum methodology experience mentioned",
+      "No user research, A/B testing, or product analytics exposure",
+      "HND qualification below the degree requirement",
+      "Skills section lists only generic soft skills with no technical competencies"
+    ],
+    skills: [
+      {n:"B2B SaaS PM",s:"missing"},{n:"SQL",s:"missing"},{n:"Amplitude/Mixpanel",s:"missing"},
+      {n:"Agile/Scrum",s:"missing"},{n:"A/B Testing",s:"missing"},{n:"User Research",s:"missing"},
+      {n:"API Knowledge",s:"missing"},{n:"Stakeholder Comms",s:"partial"},
+      {n:"Data Analysis",s:"missing"},{n:"Roadmap Planning",s:"missing"}
+    ],
+    feedback: "Dear Sarah, thank you for your interest in the Senior Product Manager role. After careful review, we regret that we are unable to progress your candidacy at this time. The role requires significant experience in software product management within a B2B SaaS environment, along with specific technical skills this application does not demonstrate. We wish you well in your job search.",
+    improvements: [
+      {t:"Career Pathway Advice", b:"If providing feedback, suggest APM bootcamps or entry-level tech roles as a pathway into product management"},
+      {t:"Skills Gap Summary", b:"Candidate would need 4–5 years of direct software PM experience before being competitive for a senior role"},
+      {t:"Alternative Consideration", b:"Assess whether this candidate may suit Project Coordinator or Operations roles within your organization"}
+    ]
+  }
+};
+
+const loadingMessages = [
+  "Reading CV structure...",
+  "Matching against requirements...",
+  "Analysing skills alignment...",
+  "Generating feedback draft...",
+  "Compiling screening report..."
+];
+
+let currentSample = null;
+let msgInterval;
+
+document.getElementById('jdInput').addEventListener('input', function() {
+  document.getElementById('jdCount').textContent = this.value.length.toLocaleString() + ' chars';
+});
+document.getElementById('cvInput').addEventListener('input', function() {
+  document.getElementById('cvCount').textContent = this.value.length.toLocaleString() + ' chars';
+});
+
+function loadSample(type) {
+  if (type === 'jd') {
+    document.getElementById('jdInput').value = samples.jd;
+    document.getElementById('jdCount').textContent = samples.jd.length.toLocaleString() + ' chars';
+    document.getElementById('roleInput').value = 'Senior Product Manager';
+  } else if (type === 'cv-strong') {
+    document.getElementById('cvInput').value = samples['cv-strong'];
+    document.getElementById('cvCount').textContent = samples['cv-strong'].length.toLocaleString() + ' chars';
+    currentSample = 'strong';
+  } else if (type === 'cv-weak') {
+    document.getElementById('cvInput').value = samples['cv-weak'];
+    document.getElementById('cvCount').textContent = samples['cv-weak'].length.toLocaleString() + ' chars';
+    currentSample = 'weak';
+  }
+  ['jd','strong','weak'].forEach(t => {
+    document.getElementById('chip-' + t)?.classList.toggle('active', t === type.replace('cv-',''));
+  });
+}
+
+function resetTool() {
+  document.getElementById('inputSection').style.display = 'block';
+  document.getElementById('resultsSection').classList.remove('active');
+  document.getElementById('loadingState').classList.remove('active');
+  document.getElementById('errorMsg').classList.remove('active');
+  document.getElementById('analyzeBtn').disabled = false;
+  currentSample = null;
+  ['jd','strong','weak'].forEach(t => document.getElementById('chip-' + t)?.classList.remove('active'));
+}
+
+function analyzeCV() {
+  const jd = document.getElementById('jdInput').value.trim();
+  const cv = document.getElementById('cvInput').value.trim();
+
+  if (!jd || jd.length < 30) { showError('Please paste a job description first.'); return; }
+  if (!cv || cv.length < 30) { showError('Please paste a candidate CV first.'); return; }
+
+  document.getElementById('inputSection').style.display = 'none';
+  document.getElementById('errorMsg').classList.remove('active');
+  document.getElementById('loadingState').classList.add('active');
+  document.getElementById('analyzeBtn').disabled = true;
+
+  let i = 0;
+  msgInterval = setInterval(() => {
+    i = (i + 1) % loadingMessages.length;
+    document.getElementById('loadingText').textContent = loadingMessages[i];
+  }, 900);
+
+  setTimeout(() => {
+    clearInterval(msgInterval);
+    renderResults(currentSample === 'weak' ? results.weak : results.strong);
+  }, 3500);
+}
+
+function renderResults(r) {
+  document.getElementById('loadingState').classList.remove('active');
+
+  // Score
+  const ring = document.getElementById('scoreRing');
+  ring.className = 'score-ring ' + r.scoreClass;
+  document.getElementById('scoreNum').className = 'score-num ' + r.numClass;
+  document.getElementById('scoreNum').textContent = r.score + '%';
+  document.getElementById('scoreVerdict').textContent = r.verdict;
+  document.getElementById('scoreSummary').textContent = r.summary;
+
+  const banner = document.getElementById('scoreBanner');
+  banner.className = 'score-banner ' + r.bannerClass;
+
+  const rec = document.getElementById('recBadge');
+  rec.textContent = r.recLabel;
+  rec.className = 'rec-badge ' + r.recClass;
+
+  // Strengths
+  document.getElementById('strengthsList').innerHTML = r.strengths.map(s =>
+    `<div class="list-item"><div class="list-dot dot-g"></div><div>${esc(s)}</div></div>`
+  ).join('');
+
+  // Gaps
+  document.getElementById('gapsList').innerHTML = r.gaps.map(g =>
+    `<div class="list-item"><div class="list-dot dot-r"></div><div>${esc(g)}</div></div>`
+  ).join('');
+
+  // Skills
+  document.getElementById('skillsWrap').innerHTML = r.skills.map(s =>
+    `<span class="skill-chip chip-${s.s}">${esc(s.n)}</span>`
+  ).join('');
+
+  // Feedback
+  document.getElementById('feedbackText').textContent = r.feedback;
+
+  // Improvements
+  document.getElementById('improveList').innerHTML = r.improvements.map((item, i) =>
+    `<div class="improve-item">
+      <div class="improve-num">0${i+1}</div>
+      <div class="improve-body">
+        <strong>${esc(item.t)}</strong>
+        <p>${esc(item.b)}</p>
+      </div>
+    </div>`
+  ).join('');
+
+  document.getElementById('resultsSection').classList.add('active');
+  document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.classList.add('active');
+}
+
+function esc(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
